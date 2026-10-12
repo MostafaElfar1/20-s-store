@@ -17,6 +17,7 @@ import AdminDashboard from './pages/admin/Dashboard'
 import AdminProducts from './pages/admin/Products'
 import AdminOrders from './pages/admin/Orders'
 import AdminOrderDetails from './pages/admin/OrderDetails'
+import { Analytics } from '@vercel/analytics/react'
 
 export default function App() {
   return (
@@ -42,6 +43,7 @@ export default function App() {
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
+        <Analytics />
       </CartProvider>
       </AuthProvider>
     </ToastProvider>
