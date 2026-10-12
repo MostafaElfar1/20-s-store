@@ -101,13 +101,13 @@ export default function ProductForm({ product, categories, onSaved, onCancel }) 
       </div>
       <Row id="p-desc" label="Description"><textarea id="p-desc" rows={4} className="field" value={f.description} onChange={set('description')} /></Row>
       <div className="flex flex-wrap gap-6 text-sm">
-        <label className="inline-flex items-center gap-2"><input type="checkbox" className="accent-[#C6A15B]" checked={f.is_active} onChange={set('is_active')} /> Active (visible in store)</label>
-        <label className="inline-flex items-center gap-2"><input type="checkbox" className="accent-[#C6A15B]" checked={f.featured} onChange={set('featured')} /> Featured</label>
+        <label className="inline-flex items-center gap-2"><input type="checkbox" className="accent-sage" checked={f.is_active} onChange={set('is_active')} /> Active (visible in store)</label>
+        <label className="inline-flex items-center gap-2"><input type="checkbox" className="accent-sage" checked={f.featured} onChange={set('featured')} /> Featured</label>
       </div>
       {saveError && <p className="border border-red-400/40 p-3 text-sm text-red-300" role="alert">{saveError}</p>}
       <div className="flex justify-end gap-3 pt-2">
         <button type="button" className="btn-outline" onClick={onCancel} disabled={saving}>Cancel</button>
-        <button type="submit" className="btn-gold" disabled={saving}>{saving ? 'Saving...' : product ? 'Save changes' : 'Create product'}</button>
+        <button type="submit" className="btn-primary" disabled={saving}>{saving ? 'Saving...' : product ? 'Save changes' : 'Create product'}</button>
       </div>
     </form>
   )

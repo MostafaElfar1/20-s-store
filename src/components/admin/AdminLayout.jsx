@@ -22,18 +22,18 @@ export default function AdminLayout() {
     )
   }
 
-  const link = ({ isActive }) => `px-3 py-2 text-xs uppercase tracking-widest hover:text-gold ${isActive ? 'text-gold' : 'text-ivory'}`
+  const link = ({ isActive }) => `px-3 py-2 text-xs uppercase tracking-widest hover:text-sage ${isActive ? 'text-sage' : 'text-mist'}`
   return (
     <div className="min-h-screen">
-      <header className="border-b border-line bg-charcoal">
+      <header className="border-b border-line bg-moss">
         <div className="container-x flex flex-wrap items-center justify-between gap-2 py-3">
-          <span className="font-display text-xl text-gold">{config.storeName} Admin</span>
+          <span className="font-display text-xl text-sage">{config.storeName} Admin</span>
           <nav className="flex flex-wrap items-center">
             <NavLink to="/admin" end className={link}>Overview</NavLink>
             <NavLink to="/admin/products" className={link}>Products</NavLink>
             <NavLink to="/admin/orders" className={link}>Orders</NavLink>
-            <NavLink to="/" className="px-3 py-2 text-xs uppercase tracking-widest text-muted hover:text-gold">View store</NavLink>
-            <button onClick={signOut} className="ml-2 inline-flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-widest text-muted hover:text-gold"><LogOut size={14} /> Sign out</button>
+            <NavLink to="/" className="px-3 py-2 text-xs uppercase tracking-widest text-muted hover:text-sage">View store</NavLink>
+            <button onClick={signOut} className="ml-2 inline-flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-widest text-muted hover:text-sage"><LogOut size={14} /> Sign out</button>
           </nav>
         </div>
       </header>

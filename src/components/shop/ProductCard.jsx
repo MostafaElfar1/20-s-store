@@ -17,8 +17,8 @@ export default function ProductCard({ product }) {
   }
 
   return (
-    <article className="group flex flex-col border border-line bg-ink transition-colors hover:border-gold/50">
-      <Link to={`/product/${product.id}`} className="block">
+    <article className="group flex flex-col border border-line bg-moss transition-colors hover:border-sage/60">
+      <Link to={`/product/${product.id}`} className="block p-3 pb-0">
         <ProductImage product={product} />
       </Link>
       <div className="flex flex-1 flex-col gap-2 p-4">
@@ -28,7 +28,7 @@ export default function ProductCard({ product }) {
         <p className={`text-xs ${stock.ok ? 'text-muted' : 'text-red-400'}`}>{stock.label}</p>
         <div className="mt-auto grid grid-cols-2 gap-2 pt-3">
           <Link to={`/product/${product.id}`} className="btn-outline px-3">Details</Link>
-          <button onClick={handleAdd} disabled={!stock.ok} className="btn-gold px-3">
+          <button onClick={handleAdd} disabled={!stock.ok} className="btn-primary px-3">
             <ShoppingBag size={14} /> Add
           </button>
         </div>

@@ -2,7 +2,7 @@
 export const config = {
   supabaseUrl: import.meta.env.VITE_SUPABASE_URL || '',
   supabaseKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '',
-  storeName: import.meta.env.VITE_STORE_NAME || "20's",
+  storeName: import.meta.env.VITE_STORE_NAME || "20'sas",
   slogan: import.meta.env.VITE_STORE_SLOGAN || 'Smell Like Your Twenties',
   // wa.me needs digits only: strip anything that is not a digit
   whatsappNumber: (import.meta.env.VITE_WHATSAPP_NUMBER || '').replace(/\D/g, ''),

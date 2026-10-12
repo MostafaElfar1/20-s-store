@@ -26,7 +26,7 @@ export default function Cart() {
           {lines.map((l) => (
             <li key={l.id} className="flex gap-4 py-5">
               <div className="w-24 shrink-0">
-                {l.product ? <ProductImage product={l.product} /> : <div className="aspect-[4/5] bg-charcoal" />}
+                {l.product ? <ProductImage product={l.product} /> : <div className="aspect-[4/5] bg-moss" />}
               </div>
               <div className="flex flex-1 flex-col gap-2">
                 <div className="flex justify-between gap-3">
@@ -45,7 +45,7 @@ export default function Cart() {
                     <QuantitySelector value={l.quantity} max={l.product.stock_quantity} onChange={(n) => setQty(l.id, n)} />
                     <div className="text-right">
                       <p className="text-xs text-muted">{formatEGP(l.product.price)} each</p>
-                      <p className="text-gold">{formatEGP(Number(l.product.price) * l.quantity)}</p>
+                      <p className="text-sage">{formatEGP(Number(l.product.price) * l.quantity)}</p>
                     </div>
                   </div>
                 )}
@@ -54,15 +54,15 @@ export default function Cart() {
           ))}
         </ul>
 
-        <aside className="h-fit border border-line bg-charcoal p-6">
+        <aside className="h-fit border border-line bg-moss p-6">
           <h2 className="text-2xl">Summary</h2>
-          <div className="mt-5 flex justify-between"><span className="text-muted">Subtotal</span><span className="text-gold">{formatEGP(subtotal)}</span></div>
+          <div className="mt-5 flex justify-between"><span className="text-muted">Subtotal</span><span className="text-sage">{formatEGP(subtotal)}</span></div>
           <p className="mt-3 text-xs text-muted">Payment: cash on delivery. Final prices are confirmed when you place the order.</p>
           {canCheckout
-            ? <Link to="/checkout" className="btn-gold mt-6 w-full">Checkout</Link>
-            : <button disabled className="btn-gold mt-6 w-full">Checkout</button>}
+            ? <Link to="/checkout" className="btn-primary mt-6 w-full">Checkout</Link>
+            : <button disabled className="btn-primary mt-6 w-full">Checkout</button>}
           {!canCheckout && <p className="mt-3 text-xs text-red-400">Fix the items above to continue.</p>}
-          <Link to="/shop" className="mt-4 block text-center text-xs uppercase tracking-widest text-muted hover:text-gold">Continue shopping</Link>
+          <Link to="/shop" className="mt-4 block text-center text-xs uppercase tracking-widest text-muted hover:text-sage">Continue shopping</Link>
         </aside>
       </div>
     </div>

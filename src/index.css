@@ -3,16 +3,17 @@
 @tailwind utilities;
 
 @layer base {
-  body { @apply bg-ink text-ivory font-body antialiased; }
+  body { @apply bg-forest text-mist font-body antialiased; }
   h1, h2, h3 { @apply font-display; }
-  :focus-visible { @apply outline outline-2 outline-offset-2 outline-gold; }
+  ::selection { @apply bg-sage text-forest; }
+  :focus-visible { @apply outline outline-2 outline-offset-2 outline-sage; }
 }
 
 @layer components {
   .btn { @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-xs font-medium uppercase tracking-widest transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-40; }
-  .btn-gold { @apply btn bg-gold text-ink hover:bg-gold-hover; }
-  .btn-outline { @apply btn border border-gold/60 text-gold hover:border-gold-hover hover:text-gold-hover; }
-  .field { @apply w-full border border-line bg-charcoal px-4 py-3 text-ivory placeholder:text-muted/70 focus:border-gold; }
+  .btn-primary { @apply btn bg-sage text-forest hover:bg-sage-hover; }
+  .btn-outline { @apply btn border border-sage/60 text-sage hover:border-sage-hover hover:text-sage-hover; }
+  .field { @apply w-full border border-line bg-moss px-4 py-3 text-mist placeholder:text-muted/70 focus:border-sage; }
   .container-x { @apply mx-auto w-full max-w-6xl px-5 sm:px-8; }
-  .eyebrow { @apply text-xs uppercase tracking-[0.3em] text-gold; }
+  .eyebrow { @apply text-xs uppercase tracking-[0.3em] text-sage; }
 }

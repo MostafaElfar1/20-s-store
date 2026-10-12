@@ -22,14 +22,14 @@ export default function OrderConfirmed() {
   return (
     <div className="container-x max-w-2xl py-14">
       <div className="text-center">
-        <CheckCircle2 className="mx-auto text-gold" size={44} />
+        <CheckCircle2 className="mx-auto text-sage" size={44} />
         <h1 className="mt-4 text-4xl">Order saved</h1>
         <p className="mt-2 text-muted">Your order was recorded in our system.</p>
         <p className="mt-5 text-xs uppercase tracking-widest text-muted">Order reference</p>
-        <p className="font-display text-3xl text-gold">{order.order_number}</p>
+        <p className="font-display text-3xl text-sage">{order.order_number}</p>
       </div>
 
-      <div className="mt-10 border border-line bg-charcoal p-6">
+      <div className="mt-10 border border-line bg-moss p-6">
         <ul className="space-y-3 text-sm">
           {order.items.map((i, idx) => (
             <li key={idx} className="flex justify-between gap-3">
@@ -38,13 +38,13 @@ export default function OrderConfirmed() {
             </li>
           ))}
         </ul>
-        <div className="mt-5 flex justify-between border-t border-line pt-4"><span>Subtotal (cash on delivery)</span><span className="text-gold">{formatEGP(order.subtotal)}</span></div>
+        <div className="mt-5 flex justify-between border-t border-line pt-4"><span>Subtotal (cash on delivery)</span><span className="text-sage">{formatEGP(order.subtotal)}</span></div>
         <p className="mt-4 text-sm text-muted">Deliver to: {customer.name}, {customer.phone}<br />{customer.governorate}, {customer.address}</p>
       </div>
 
-      <div className="mt-6 border border-gold/40 p-6">
+      <div className="mt-6 border border-sage/40 p-6">
         <div className="flex items-start gap-3">
-          <AlertTriangle size={18} className="mt-0.5 shrink-0 text-gold" />
+          <AlertTriangle size={18} className="mt-0.5 shrink-0 text-sage" />
           <div className="text-sm">
             <p className="font-medium">One more step: send the details on WhatsApp</p>
             <p className="mt-1 text-muted">
@@ -54,9 +54,9 @@ export default function OrderConfirmed() {
           </div>
         </div>
         {waUrl
-          ? <a href={waUrl} target="_blank" rel="noopener noreferrer" className="btn-gold mt-5 w-full"><MessageCircle size={16} /> Send order on WhatsApp</a>
+          ? <a href={waUrl} target="_blank" rel="noopener noreferrer" className="btn-primary mt-5 w-full"><MessageCircle size={16} /> Send order on WhatsApp</a>
           : <>
-              <button disabled className="btn-gold mt-5 w-full"><MessageCircle size={16} /> Send order on WhatsApp</button>
+              <button disabled className="btn-primary mt-5 w-full"><MessageCircle size={16} /> Send order on WhatsApp</button>
               <p className="mt-2 text-xs text-red-400">WhatsApp number is not configured. Set VITE_WHATSAPP_NUMBER (see README).</p>
             </>}
       </div>

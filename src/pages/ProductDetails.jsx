@@ -47,7 +47,7 @@ export default function ProductDetails() {
 
   return (
     <div className="container-x py-10">
-      <Link to="/shop" className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-muted hover:text-gold"><ArrowLeft size={14} /> Back to shop</Link>
+      <Link to="/shop" className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-muted hover:text-sage"><ArrowLeft size={14} /> Back to shop</Link>
       <div className="mt-8 grid gap-10 md:grid-cols-2">
         <ProductImage product={product} className="border border-line" />
         <div>
@@ -56,7 +56,7 @@ export default function ProductDetails() {
           <div className="mt-5"><Price product={product} large /></div>
           <p className={`mt-3 text-sm ${stock.ok ? 'text-muted' : 'text-red-400'}`}>{stock.label}</p>
 
-          {product.description && <p className="mt-8 whitespace-pre-line leading-relaxed text-ivory/90">{product.description}</p>}
+          {product.description && <p className="mt-8 whitespace-pre-line leading-relaxed text-mist/90">{product.description}</p>}
 
           {specs.length > 0 && (
             <dl className="mt-8 divide-y divide-line border-y border-line text-sm">
@@ -68,7 +68,7 @@ export default function ProductDetails() {
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
             {stock.ok && <QuantitySelector value={qty} max={product.stock_quantity} onChange={setQty} />}
-            <button className="btn-gold flex-1 sm:flex-none" disabled={!stock.ok} onClick={handleAdd}>
+            <button className="btn-primary flex-1 sm:flex-none" disabled={!stock.ok} onClick={handleAdd}>
               <ShoppingBag size={14} /> {stock.ok ? 'Add to cart' : 'Out of stock'}
             </button>
           </div>

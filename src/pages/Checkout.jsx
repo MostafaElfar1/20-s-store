@@ -121,21 +121,21 @@ export default function Checkout() {
             <textarea id="notes" rows={2} className="field" value={form.notes} onChange={set('notes')} />
           </Field>
 
-          <div className="border border-line bg-charcoal p-4 text-sm">
-            <p className="text-ivory">Payment method: <span className="text-gold">Cash on delivery</span></p>
+          <div className="border border-line bg-moss p-4 text-sm">
+            <p className="text-mist">Payment method: <span className="text-sage">Cash on delivery</span></p>
           </div>
 
-          {submitError && <div className="border border-red-400/40 bg-charcoal p-4 text-sm text-red-300" role="alert">{submitError}</div>}
+          {submitError && <div className="border border-red-400/40 bg-moss p-4 text-sm text-red-300" role="alert">{submitError}</div>}
           {!canCheckout && !submitError && (
             <p className="text-sm text-red-400">Some items in your cart need attention. <Link to="/cart" className="underline">Review cart</Link></p>
           )}
 
-          <button type="submit" className="btn-gold w-full" disabled={submitting || !canCheckout}>
+          <button type="submit" className="btn-primary w-full" disabled={submitting || !canCheckout}>
             {submitting ? 'Placing order...' : 'Place order'}
           </button>
         </form>
 
-        <aside className="h-fit border border-line bg-charcoal p-6">
+        <aside className="h-fit border border-line bg-moss p-6">
           <h2 className="text-2xl">Order summary</h2>
           <ul className="mt-5 space-y-3 text-sm">
             {lines.map((l) => (
@@ -145,7 +145,7 @@ export default function Checkout() {
               </li>
             ))}
           </ul>
-          <div className="mt-5 flex justify-between border-t border-line pt-4"><span>Subtotal</span><span className="text-gold">{formatEGP(subtotal)}</span></div>
+          <div className="mt-5 flex justify-between border-t border-line pt-4"><span>Subtotal</span><span className="text-sage">{formatEGP(subtotal)}</span></div>
           <p className="mt-3 text-xs text-muted">The final total is calculated by the store's database when you place the order.</p>
         </aside>
       </div>

@@ -29,7 +29,7 @@ export default function OrderDetails() {
   const { order, loading, error } = state
   if (loading && !order) return <Spinner />
   if (error) return <ErrorState message={error} onRetry={load} />
-  if (!order) return <p className="text-muted">Order not found. <Link to="/admin/orders" className="text-gold">Back to orders</Link></p>
+  if (!order) return <p className="text-muted">Order not found. <Link to="/admin/orders" className="text-sage">Back to orders</Link></p>
 
   const changeStatus = async (next) => {
     setUpdating(true)
@@ -51,14 +51,14 @@ export default function OrderDetails() {
 
   return (
     <div>
-      <Link to="/admin/orders" className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-muted hover:text-gold"><ArrowLeft size={14} /> Orders</Link>
+      <Link to="/admin/orders" className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-muted hover:text-sage"><ArrowLeft size={14} /> Orders</Link>
       <div className="mt-4 flex flex-wrap items-center gap-4">
         <h1 className="text-4xl">{order.order_number}</h1><StatusBadge status={order.status} />
       </div>
       <p className="mt-1 text-sm text-muted">Placed {formatDate(order.created_at)} / Last updated {formatDate(order.updated_at)}</p>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <section className="border border-line bg-charcoal p-6">
+        <section className="border border-line bg-moss p-6">
           <h2 className="text-2xl">Customer</h2>
           <dl className="mt-4 space-y-3 text-sm">
             <div><dt className="text-muted">Name</dt><dd>{order.customer_name}</dd></div>
@@ -74,7 +74,7 @@ export default function OrderDetails() {
           </div>
         </section>
 
-        <section className="border border-line bg-charcoal p-6">
+        <section className="border border-line bg-moss p-6">
           <h2 className="text-2xl">Status</h2>
           {next.length === 0
             ? <p className="mt-4 text-sm text-muted">This order is {order.status}. No further changes are possible.</p>
@@ -82,7 +82,7 @@ export default function OrderDetails() {
               <div className="mt-4 flex flex-wrap gap-3">
                 {next.map((s) => (
                   <button key={s} disabled={updating} onClick={() => (s === 'cancelled' ? setConfirmCancel(true) : changeStatus(s))}
-                    className={`${s === 'cancelled' ? 'btn-outline' : 'btn-gold'} capitalize`}>Mark {s}</button>
+                    className={`${s === 'cancelled' ? 'btn-outline' : 'btn-primary'} capitalize`}>Mark {s}</button>
                 ))}
               </div>)}
           <p className="mt-5 text-xs text-muted">
@@ -95,7 +95,7 @@ export default function OrderDetails() {
         </section>
       </div>
 
-      <section className="mt-6 border border-line bg-charcoal p-6">
+      <section className="mt-6 border border-line bg-moss p-6">
         <h2 className="text-2xl">Items</h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[480px] text-left text-sm">
@@ -105,14 +105,14 @@ export default function OrderDetails() {
             ))}</tbody>
           </table>
         </div>
-        <div className="mt-4 flex justify-between border-t border-line pt-4"><span>Subtotal</span><span className="text-xl text-gold">{formatEGP(order.subtotal)}</span></div>
+        <div className="mt-4 flex justify-between border-t border-line pt-4"><span>Subtotal</span><span className="text-xl text-sage">{formatEGP(order.subtotal)}</span></div>
       </section>
       {confirmCancel && (
         <Modal title="Cancel this order?" onClose={() => setConfirmCancel(false)}>
           <p className="text-sm text-muted">The items will be returned to stock and the order cannot be changed afterwards.</p>
           <div className="mt-6 flex justify-end gap-3">
             <button className="btn-outline" onClick={() => setConfirmCancel(false)}>Keep order</button>
-            <button className="btn-gold" disabled={updating} onClick={async () => { await changeStatus('cancelled'); setConfirmCancel(false) }}>Cancel order</button>
+            <button className="btn-primary" disabled={updating} onClick={async () => { await changeStatus('cancelled'); setConfirmCancel(false) }}>Cancel order</button>
           </div>
         </Modal>
       )}

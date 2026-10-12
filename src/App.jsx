@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import { CartProvider } from './context/CartContext'
 import { ToastProvider } from './context/ToastContext'
 import Layout from './components/layout/Layout'
@@ -44,6 +45,7 @@ export default function App() {
         </Routes>
       </CartProvider>
       </AuthProvider>
+      <Analytics />
     </ToastProvider>
   )
 }

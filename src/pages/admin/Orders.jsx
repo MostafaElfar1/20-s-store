@@ -54,14 +54,14 @@ export default function Orders() {
       <div className="mt-6">
         {state.loading && shown.length === 0 && <Spinner />}
         {state.error && <ErrorState message={state.error} onRetry={load} />}
-        {!state.loading && !state.error && shown.length === 0 && <p className="border border-line bg-charcoal p-8 text-center text-muted">No orders found.</p>}
+        {!state.loading && !state.error && shown.length === 0 && <p className="border border-line bg-moss p-8 text-center text-muted">No orders found.</p>}
         {shown.length > 0 && (
           <div className="overflow-x-auto border border-line">
             <table className="w-full min-w-[640px] text-left text-sm">
-              <thead className="bg-charcoal text-xs uppercase tracking-widest text-muted"><tr><th className="p-3">Order</th><th className="p-3">Customer</th><th className="p-3">Phone</th><th className="p-3">Total</th><th className="p-3">Status</th><th className="p-3">Placed</th></tr></thead>
+              <thead className="bg-moss text-xs uppercase tracking-widest text-muted"><tr><th className="p-3">Order</th><th className="p-3">Customer</th><th className="p-3">Phone</th><th className="p-3">Total</th><th className="p-3">Status</th><th className="p-3">Placed</th></tr></thead>
               <tbody>{shown.map((o) => (
                 <tr key={o.id} className="border-t border-line">
-                  <td className="p-3"><Link className="text-gold hover:underline" to={`/admin/orders/${o.id}`}>{o.order_number}</Link></td>
+                  <td className="p-3"><Link className="text-sage hover:underline" to={`/admin/orders/${o.id}`}>{o.order_number}</Link></td>
                   <td className="p-3">{o.customer_name}</td><td className="p-3">{o.customer_phone}</td>
                   <td className="p-3">{formatEGP(o.subtotal)}</td><td className="p-3"><StatusBadge status={o.status} /></td>
                   <td className="p-3 text-muted">{formatDate(o.created_at)}</td>

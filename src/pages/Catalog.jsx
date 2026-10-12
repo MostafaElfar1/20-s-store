@@ -62,7 +62,7 @@ export default function Catalog() {
         </select>
       </div>
       <label className="mt-4 inline-flex cursor-pointer items-center gap-2 text-sm text-muted">
-        <input type="checkbox" className="accent-[#C6A15B]" checked={featuredOnly} onChange={(e) => update('featured', e.target.checked ? '1' : '')} />
+        <input type="checkbox" className="accent-sage" checked={featuredOnly} onChange={(e) => update('featured', e.target.checked ? '1' : '')} />
         Featured only
       </label>
 

@@ -7,7 +7,7 @@ export default function ImageUpload({ previewUrl, alt, error, onPick, onRemove }
   return (
     <div>
       <div className="flex items-start gap-4">
-        <div className="flex aspect-[4/5] w-28 shrink-0 items-center justify-center overflow-hidden border border-line bg-charcoal">
+        <div className="flex aspect-[4/5] w-28 shrink-0 items-center justify-center overflow-hidden border border-line bg-moss">
           {previewUrl ? <img src={previewUrl} alt={alt} className="h-full w-full object-cover" /> : <ImagePlus className="text-muted" />}
         </div>
         <div className="space-y-2 text-sm">
