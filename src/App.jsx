@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import { CartProvider } from './context/CartContext'
 import { ToastProvider } from './context/ToastContext'
 import Layout from './components/layout/Layout'
@@ -42,6 +43,7 @@ export default function App() {
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
+        <SpeedInsights />
       </CartProvider>
       </AuthProvider>
     </ToastProvider>
