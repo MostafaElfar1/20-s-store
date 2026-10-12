@@ -1,0 +1,66 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      # Your local .env file is NOT in the repo, so the build gets its values from
+      # GitHub: Settings > Secrets and variables > Actions > Variables tab.
+      # These are PUBLIC values (they end up in the website's JavaScript).
+      - name: Check the Supabase key is a public one
+        run: bash scripts/check-public-key.sh
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_STORE_NAME: ${{ vars.VITE_STORE_NAME }}
+          VITE_STORE_SLOGAN: ${{ vars.VITE_STORE_SLOGAN }}
+          VITE_WHATSAPP_NUMBER: ${{ vars.VITE_WHATSAPP_NUMBER }}
+          VITE_INSTAGRAM_URL: ${{ vars.VITE_INSTAGRAM_URL }}
+          VITE_FACEBOOK_URL: ${{ vars.VITE_FACEBOOK_URL }}
+
+      - name: Make sure asset paths are relative (needed for the repo subpath)
+        run: |
+          grep -E 'src="\./assets/|href="\./assets/' dist/index.html
+          if grep -E 'src="/assets/|href="/assets/' dist/index.html; then echo "Absolute asset paths found"; exit 1; fi
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
