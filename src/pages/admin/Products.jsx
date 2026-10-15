@@ -55,13 +55,13 @@ export default function Products() {
       {state.loading && <Spinner />}
       {state.error && <div className="mt-6"><ErrorState message={state.error} onRetry={load} /></div>}
       {!state.loading && !state.error && state.products.length === 0 && (
-        <p className="mt-8 border border-line bg-moss p-8 text-center text-muted">No products yet. Add your first one.</p>
+        <p className="mt-8 border border-line bg-paper p-8 text-center text-muted">No products yet. Add your first one.</p>
       )}
 
       {state.products.length > 0 && (
         <div className="mt-8 overflow-x-auto border border-line">
           <table className="w-full min-w-[720px] text-left text-sm">
-            <thead className="bg-moss text-xs uppercase tracking-widest text-muted">
+            <thead className="bg-paper text-xs uppercase tracking-widest text-muted">
               <tr><th className="p-3">Product</th><th className="p-3">Price</th><th className="p-3">Stock</th><th className="p-3">Status</th><th className="p-3 text-right">Actions</th></tr>
             </thead>
             <tbody>
@@ -74,16 +74,16 @@ export default function Products() {
                     </div>
                   </td>
                   <td className="p-3">{formatEGP(p.price)}</td>
-                  <td className={`p-3 ${p.stock_quantity === 0 ? 'text-red-400' : p.stock_quantity <= 5 ? 'text-yellow-300' : ''}`}>{p.stock_quantity}</td>
+                  <td className={`p-3 ${p.stock_quantity === 0 ? 'text-danger' : p.stock_quantity <= 5 ? 'text-yellow-300' : ''}`}>{p.stock_quantity}</td>
                   <td className="p-3 text-xs">
                     <span className={p.is_active ? 'text-emerald-300' : 'text-muted'}>{p.is_active ? 'Active' : 'Hidden'}</span>
-                    {p.featured && <span className="ml-2 text-sage">Featured</span>}
+                    {p.featured && <span className="ml-2 text-forest">Featured</span>}
                   </td>
                   <td className="p-3">
                     <div className="flex justify-end gap-1">
-                      <button className="p-2 hover:text-sage" aria-label={`Edit ${p.name}`} onClick={() => setEditing(p)}><Pencil size={16} /></button>
-                      <button className="p-2 hover:text-sage" aria-label={p.is_active ? `Hide ${p.name}` : `Show ${p.name}`} onClick={() => toggleActive(p)}><Power size={16} /></button>
-                      <button className="p-2 hover:text-red-400" aria-label={`Delete ${p.name}`} onClick={() => setDeleting(p)}><Trash2 size={16} /></button>
+                      <button className="p-2 hover:text-forest" aria-label={`Edit ${p.name}`} onClick={() => setEditing(p)}><Pencil size={16} /></button>
+                      <button className="p-2 hover:text-forest" aria-label={p.is_active ? `Hide ${p.name}` : `Show ${p.name}`} onClick={() => toggleActive(p)}><Power size={16} /></button>
+                      <button className="p-2 hover:text-danger" aria-label={`Delete ${p.name}`} onClick={() => setDeleting(p)}><Trash2 size={16} /></button>
                     </div>
                   </td>
                 </tr>

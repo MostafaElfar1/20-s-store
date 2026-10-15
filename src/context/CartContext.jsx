@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { useLang } from '../i18n/LanguageContext'
 
 // The cart only stores {id, quantity}. Prices and stock always come from the database,
 // the cart is a convenience and is never trusted by the server (create_order re-checks everything).
@@ -17,6 +18,7 @@ function loadItems() {
 }
 
 export function CartProvider({ children }) {
+  const { t } = useLang()
   const [items, setItems] = useState(loadItems)
   const [products, setProducts] = useState({})
   const [loaded, setLoaded] = useState(false)
@@ -32,9 +34,9 @@ export function CartProvider({ children }) {
   const refresh = useCallback(async () => {
     const list = ids ? ids.split(',') : []
     if (!list.length) { setProducts({}); setLoaded(true); setLoadError(null); return {} }
-    if (!supabase) { setLoadError('Not connected to Supabase.'); setLoaded(true); return {} }
+    if (!supabase) { setLoadError('not_connected'); setLoaded(true); return {} }
     const { data, error } = await supabase.from('products').select('*').in('id', list)
-    if (error) { setLoadError('Could not refresh prices and stock. Check your connection.'); setLoaded(true); return null }
+    if (error) { setLoadError('refresh_failed'); setLoaded(true); return null }
     const map = Object.fromEntries(data.map((p) => [p.id, p]))
     setProducts(map); setLoadError(null); setLoaded(true)
     return map
@@ -43,20 +45,20 @@ export function CartProvider({ children }) {
   useEffect(() => { refresh() }, [refresh])
 
   const add = useCallback((product, qty = 1) => {
-    if (product.stock_quantity <= 0) return { ok: false, message: 'This product is out of stock.' }
-    let result = { ok: true, message: 'Added to cart.' }
+    if (product.stock_quantity <= 0) return { ok: false, message: t('cart.outOfStock') }
+    let result = { ok: true, message: t('cart.added') }
     setItems((prev) => {
       const existing = prev.find((i) => i.id === product.id)
       const wanted = (existing?.quantity || 0) + qty
       const next = Math.min(wanted, product.stock_quantity)
-      if (wanted > product.stock_quantity) result = { ok: true, message: `Only ${product.stock_quantity} available. Cart updated.` }
+      if (wanted > product.stock_quantity) result = { ok: true, message: t('cart.limited', { n: product.stock_quantity }) }
       return existing
         ? prev.map((i) => (i.id === product.id ? { ...i, quantity: next } : i))
         : [...prev, { id: product.id, quantity: next }]
     })
     setProducts((m) => ({ ...m, [product.id]: product }))
     return result
-  }, [])
+  }, [t])
 
   const setQty = useCallback((id, qty) => {
     setItems((prev) => prev.map((i) => {

@@ -11,7 +11,7 @@ const Row = ({ id, label, error, children }) => (
   <div>
     <label htmlFor={id} className="mb-1 block text-xs uppercase tracking-widest text-muted">{label}</label>
     {children}
-    {error && <p className="mt-1 text-sm text-red-400" role="alert">{error}</p>}
+    {error && <p className="mt-1 text-sm text-danger" role="alert">{error}</p>}
   </div>
 )
 
@@ -20,7 +20,8 @@ export default function ProductForm({ product, categories, onSaved, onCancel }) 
     name: product?.name ?? '', brand: product?.brand ?? '', description: product?.description ?? '',
     price: product?.price ?? '', compare_at_price: product?.compare_at_price ?? '',
     stock_quantity: product?.stock_quantity ?? 0, volume_ml: product?.volume_ml ?? '',
-    category: product?.category ?? '', featured: product?.featured ?? false, is_active: product?.is_active ?? true,
+    category: product?.category ?? '',
+    name_ar: product?.name_ar ?? '', description_ar: product?.description_ar ?? '', category_ar: product?.category_ar ?? '', featured: product?.featured ?? false, is_active: product?.is_active ?? true,
   })
   const [errors, setErrors] = useState({})
   const [imageFile, setImageFile] = useState(null)
@@ -63,7 +64,8 @@ export default function ProductForm({ product, categories, onSaved, onCancel }) 
         name: f.name.trim(), brand: f.brand.trim() || null, description: f.description.trim() || null,
         price: Number(f.price), compare_at_price: f.compare_at_price === '' ? null : Number(f.compare_at_price),
         stock_quantity: Number(f.stock_quantity), volume_ml: f.volume_ml === '' ? null : Number(f.volume_ml),
-        category: f.category.trim() || null, featured: f.featured, is_active: f.is_active, image_path,
+        category: f.category.trim() || null,
+        name_ar: f.name_ar.trim() || null, description_ar: f.description_ar.trim() || null, category_ar: f.category_ar.trim() || null, featured: f.featured, is_active: f.is_active, image_path,
       }
       const { error } = product
         ? await supabase.from('products').update(payload).eq('id', product.id)
@@ -100,11 +102,19 @@ export default function ProductForm({ product, categories, onSaved, onCancel }) 
         <Row id="p-vol" label="Volume (ml)" error={errors.volume_ml}><input id="p-vol" type="number" min="1" step="1" className="field" value={f.volume_ml} onChange={set('volume_ml')} /></Row>
       </div>
       <Row id="p-desc" label="Description"><textarea id="p-desc" rows={4} className="field" value={f.description} onChange={set('description')} /></Row>
+
+      <fieldset className="space-y-4 rounded-xl border border-line p-4">
+        <legend className="px-2 text-xs uppercase tracking-widest text-muted">Arabic version (optional)</legend>
+        <Row id="p-name-ar" label="Name (Arabic)"><input id="p-name-ar" dir="rtl" className="field" value={f.name_ar} onChange={set('name_ar')} /></Row>
+        <Row id="p-cat-ar" label="Category (Arabic)"><input id="p-cat-ar" dir="rtl" className="field" value={f.category_ar} onChange={set('category_ar')} /></Row>
+        <Row id="p-desc-ar" label="Description (Arabic)"><textarea id="p-desc-ar" dir="rtl" rows={3} className="field" value={f.description_ar} onChange={set('description_ar')} /></Row>
+        <p className="text-xs text-muted">If left empty, the English text is shown in the Arabic version of the store.</p>
+      </fieldset>
       <div className="flex flex-wrap gap-6 text-sm">
-        <label className="inline-flex items-center gap-2"><input type="checkbox" className="accent-sage" checked={f.is_active} onChange={set('is_active')} /> Active (visible in store)</label>
-        <label className="inline-flex items-center gap-2"><input type="checkbox" className="accent-sage" checked={f.featured} onChange={set('featured')} /> Featured</label>
+        <label className="inline-flex items-center gap-2"><input type="checkbox" className="accent-[#103C21]" checked={f.is_active} onChange={set('is_active')} /> Active (visible in store)</label>
+        <label className="inline-flex items-center gap-2"><input type="checkbox" className="accent-[#103C21]" checked={f.featured} onChange={set('featured')} /> Featured</label>
       </div>
-      {saveError && <p className="border border-red-400/40 p-3 text-sm text-red-300" role="alert">{saveError}</p>}
+      {saveError && <p className="border border-danger/40 p-3 text-sm text-danger" role="alert">{saveError}</p>}
       <div className="flex justify-end gap-3 pt-2">
         <button type="button" className="btn-outline" onClick={onCancel} disabled={saving}>Cancel</button>
         <button type="submit" className="btn-primary" disabled={saving}>{saving ? 'Saving...' : product ? 'Save changes' : 'Create product'}</button>

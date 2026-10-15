@@ -2,12 +2,14 @@ import { NavLink, Navigate, Outlet } from 'react-router-dom'
 import { LogOut } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { config } from '../../lib/config'
+import { useForceLtr } from '../../i18n/LanguageContext'
 import Spinner from '../ui/Spinner'
 import ErrorState from '../ui/ErrorState'
 
 // Guard: nothing from the admin area renders until the database confirms this user is an admin.
 export default function AdminLayout() {
   const { session, isAdmin, loading, checkError, signOut } = useAuth()
+  useForceLtr()
 
   if (loading) return <Spinner label="Checking access..." />
   if (!session) return <Navigate to="/admin/login" replace />
@@ -22,18 +24,19 @@ export default function AdminLayout() {
     )
   }
 
-  const link = ({ isActive }) => `px-3 py-2 text-xs uppercase tracking-widest hover:text-sage ${isActive ? 'text-sage' : 'text-mist'}`
+  const link = ({ isActive }) => `px-3 py-2 text-xs uppercase tracking-widest hover:text-forest ${isActive ? 'text-forest' : 'text-ink'}`
   return (
     <div className="min-h-screen">
-      <header className="border-b border-line bg-moss">
+      <header className="border-b border-line bg-paper">
         <div className="container-x flex flex-wrap items-center justify-between gap-2 py-3">
-          <span className="font-display text-xl text-sage">{config.storeName} Admin</span>
+          <span className="font-display text-xl text-forest">{config.storeName} Admin</span>
           <nav className="flex flex-wrap items-center">
             <NavLink to="/admin" end className={link}>Overview</NavLink>
             <NavLink to="/admin/products" className={link}>Products</NavLink>
             <NavLink to="/admin/orders" className={link}>Orders</NavLink>
-            <NavLink to="/" className="px-3 py-2 text-xs uppercase tracking-widest text-muted hover:text-sage">View store</NavLink>
-            <button onClick={signOut} className="ml-2 inline-flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-widest text-muted hover:text-sage"><LogOut size={14} /> Sign out</button>
+            <NavLink to="/admin/analytics" className={link}>Analytics</NavLink>
+            <NavLink to="/" className="px-3 py-2 text-xs uppercase tracking-widest text-muted hover:text-forest">View store</NavLink>
+            <button onClick={signOut} className="ml-2 inline-flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-widest text-muted hover:text-forest"><LogOut size={14} /> Sign out</button>
           </nav>
         </div>
       </header>

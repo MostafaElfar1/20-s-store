@@ -1,23 +1,31 @@
 import { formatEGP } from './format'
 
+// The message is written in the language the customer is using.
+const TEXT = {
+  en: { newOrder: 'New order', order: 'Order', name: 'Name', phone: 'Phone', address: 'Address', items: 'Items', subtotal: 'Subtotal', payment: 'Payment: Cash on delivery' },
+  ar: { newOrder: 'طلب جديد', order: 'رقم الطلب', name: 'الاسم', phone: 'الهاتف', address: 'العنوان', items: 'المنتجات', subtotal: 'المجموع', payment: 'الدفع: عند الاستلام' },
+}
+
 // Pure functions (no env access) so they are easy to test.
-export function buildOrderMessage({ storeName, order, customer }) {
+export function buildOrderMessage({ storeName, order, customer, lang = 'en' }) {
+  const x = TEXT[lang] || TEXT.en
+  const f = (n) => formatEGP(n, lang)
   const lines = order.items.map(
-    (i) => `- ${i.name} x${i.quantity} @ ${formatEGP(i.unit_price)} = ${formatEGP(i.line_total)}`
+    (i) => `- ${i.name} x${i.quantity} @ ${f(i.unit_price)} = ${f(i.line_total)}`
   )
   return [
-    `${storeName} - New order`,
-    `Order: ${order.order_number}`,
+    `${storeName} - ${x.newOrder}`,
+    `${x.order}: ${order.order_number}`,
     '',
-    `Name: ${customer.name}`,
-    `Phone: ${customer.phone}`,
-    `Address: ${customer.governorate}, ${customer.address}`,
+    `${x.name}: ${customer.name}`,
+    `${x.phone}: ${customer.phone}`,
+    `${x.address}: ${customer.governorate}, ${customer.address}`,
     '',
-    'Items:',
+    `${x.items}:`,
     ...lines,
     '',
-    `Subtotal: ${formatEGP(order.subtotal)}`,
-    'Payment: Cash on delivery',
+    `${x.subtotal}: ${f(order.subtotal)}`,
+    x.payment,
   ].join('\n')
 }
 

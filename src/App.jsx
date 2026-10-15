@@ -1,7 +1,9 @@
 import { Route, Routes } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
+import PageTracker from './components/layout/PageTracker'
 import { CartProvider } from './context/CartContext'
 import { ToastProvider } from './context/ToastContext'
+import { LanguageProvider } from './i18n/LanguageContext'
 import Layout from './components/layout/Layout'
 import Home from './pages/Home'
 import Catalog from './pages/Catalog'
@@ -18,18 +20,27 @@ import AdminDashboard from './pages/admin/Dashboard'
 import AdminProducts from './pages/admin/Products'
 import AdminOrders from './pages/admin/Orders'
 import AdminOrderDetails from './pages/admin/OrderDetails'
+import AdminAnalytics from './pages/admin/Analytics'
 
 export default function App() {
   return (
+    <LanguageProvider>
     <ToastProvider>
       <AuthProvider>
       <CartProvider>
+        <PageTracker />
+        {/* HashRouter keeps the page in the URL hash; rewrite it so Vercel sees /product/..., and skip admin pages. */}
+        <Analytics beforeSend={(e) => {
+          const url = e.url.replace('/#/', '/')
+          return /\/admin/.test(url) ? null : { ...e, url }
+        }} />
         <Routes>
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
             <Route path="orders/:id" element={<AdminOrderDetails />} />
           </Route>
           <Route element={<Layout />}>
@@ -45,7 +56,7 @@ export default function App() {
         </Routes>
       </CartProvider>
       </AuthProvider>
-      <Analytics />
     </ToastProvider>
+    </LanguageProvider>
   )
 }

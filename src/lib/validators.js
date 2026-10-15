@@ -13,12 +13,23 @@ export const GOVERNORATES = [
   'Red Sea', 'Matrouh', 'New Valley',
 ]
 
+export const GOVERNORATES_AR = {
+  'Cairo': 'القاهرة', 'Giza': 'الجيزة', 'Alexandria': 'الإسكندرية', 'Qalyubia': 'القليوبية',
+  'Dakahlia': 'الدقهلية', 'Sharqia': 'الشرقية', 'Gharbia': 'الغربية', 'Monufia': 'المنوفية',
+  'Beheira': 'البحيرة', 'Kafr El Sheikh': 'كفر الشيخ', 'Damietta': 'دمياط', 'Port Said': 'بورسعيد',
+  'Ismailia': 'الإسماعيلية', 'Suez': 'السويس', 'North Sinai': 'شمال سيناء', 'South Sinai': 'جنوب سيناء',
+  'Faiyum': 'الفيوم', 'Beni Suef': 'بني سويف', 'Minya': 'المنيا', 'Asyut': 'أسيوط', 'Sohag': 'سوهاج',
+  'Qena': 'قنا', 'Luxor': 'الأقصر', 'Aswan': 'أسوان', 'Red Sea': 'البحر الأحمر', 'Matrouh': 'مطروح',
+  'New Valley': 'الوادي الجديد',
+}
+
+// Returns error CODES (translated by the page), so the messages follow the selected language.
 export function validateCheckout(f) {
   const e = {}
-  if (f.name.trim().length < 2) e.name = 'Please enter your full name.'
-  if (!isValidEgyptPhone(f.phone)) e.phone = 'Enter a valid Egyptian mobile number, e.g. 01012345678.'
-  if (!f.governorate) e.governorate = 'Please choose your governorate.'
-  if (f.address.trim().length < 8) e.address = 'Please enter a detailed delivery address.'
-  if (!isValidEmail(f.email.trim())) e.email = 'Please enter a valid email or leave it empty.'
+  if (f.name.trim().length < 2) e.name = 'name'
+  if (!isValidEgyptPhone(f.phone)) e.phone = 'phone'
+  if (!f.governorate) e.governorate = 'governorate'
+  if (f.address.trim().length < 8) e.address = 'address'
+  if (!isValidEmail(f.email.trim())) e.email = 'email'
   return e
 }

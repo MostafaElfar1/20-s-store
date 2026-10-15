@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
 import { Trash2 } from 'lucide-react'
 import { useCart } from '../context/CartContext'
-import { formatEGP } from '../lib/format'
+import { useLang } from '../i18n/LanguageContext'
+import { pick } from '../lib/products'
 import ProductImage from '../components/shop/ProductImage'
 import QuantitySelector from '../components/ui/QuantitySelector'
 import EmptyState from '../components/ui/EmptyState'
@@ -10,59 +11,63 @@ import Spinner from '../components/ui/Spinner'
 
 export default function Cart() {
   const { lines, subtotal, canCheckout, loaded, loadError, setQty, remove, refresh } = useCart()
+  const { t, lang, money } = useLang()
 
   if (lines.length === 0) {
-    return <div className="container-x py-16"><EmptyState title="Your cart is empty" text="Browse the collection and add a fragrance you like." action="Shop now" to="/shop" /></div>
+    return <div className="container-x py-16"><EmptyState title={t('cart.empty.title')} text={t('cart.empty.text')} action={t('cart.shopNow')} to="/shop" /></div>
   }
-  if (!loaded) return <Spinner label="Checking prices and stock..." />
+  if (!loaded) return <Spinner label={t('cart.checking')} />
 
   return (
     <div className="container-x py-12">
-      <h1 className="text-4xl sm:text-5xl">Your cart</h1>
-      {loadError && <div className="mt-6"><ErrorState message={loadError} onRetry={refresh} /></div>}
+      <h1 className="text-4xl text-forest sm:text-5xl">{t('cart.title')}</h1>
+      {loadError && <div className="mt-6"><ErrorState message={t(`err.${loadError}`)} onRetry={refresh} /></div>}
 
-      <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_340px]">
-        <ul className="divide-y divide-line border-y border-line">
-          {lines.map((l) => (
-            <li key={l.id} className="flex gap-4 py-5">
-              <div className="w-24 shrink-0">
-                {l.product ? <ProductImage product={l.product} /> : <div className="aspect-[4/5] bg-moss" />}
-              </div>
-              <div className="flex flex-1 flex-col gap-2">
-                <div className="flex justify-between gap-3">
-                  <div>
-                    <p className="font-display text-lg">{l.product?.name ?? 'Unavailable product'}</p>
-                    {l.product?.brand && <p className="text-xs uppercase tracking-widest text-muted">{l.product.brand}</p>}
-                  </div>
-                  <button aria-label={`Remove ${l.product?.name ?? 'item'}`} onClick={() => remove(l.id)} className="h-fit p-1 text-muted hover:text-red-400"><Trash2 size={16} /></button>
+      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_340px]">
+        <ul className="space-y-4">
+          {lines.map((l) => {
+            const name = l.product ? pick(l.product, 'name', lang) : t('cart.unavailableName')
+            return (
+              <li key={l.id} className="flex gap-4 rounded-2xl border border-line bg-paper p-3 shadow-card sm:p-4">
+                <div className="w-24 shrink-0">
+                  {l.product ? <ProductImage product={l.product} className="rounded-xl" /> : <div className="aspect-[4/5] rounded-xl bg-sage-soft" />}
                 </div>
-                {l.unavailable && <p className="text-sm text-red-400">This product is no longer available. Please remove it to continue.</p>}
-                {!l.unavailable && l.overStock && (
-                  <p className="text-sm text-red-400">Only {l.product.stock_quantity} left. Reduce the quantity to continue.</p>
-                )}
-                {l.product && !l.unavailable && (
-                  <div className="mt-auto flex items-center justify-between">
-                    <QuantitySelector value={l.quantity} max={l.product.stock_quantity} onChange={(n) => setQty(l.id, n)} />
-                    <div className="text-right">
-                      <p className="text-xs text-muted">{formatEGP(l.product.price)} each</p>
-                      <p className="text-sage">{formatEGP(Number(l.product.price) * l.quantity)}</p>
+                <div className="flex flex-1 flex-col gap-2">
+                  <div className="flex justify-between gap-3">
+                    <div>
+                      <p className="font-display text-lg text-ink">{name}</p>
+                      {l.product?.brand && <p className="text-xs uppercase tracking-[0.14em] text-muted">{l.product.brand}</p>}
                     </div>
+                    <button aria-label={t('cart.remove', { name })} onClick={() => remove(l.id)} className="h-fit rounded-full p-2 text-muted transition-colors hover:bg-sage-soft hover:text-danger"><Trash2 size={16} /></button>
                   </div>
-                )}
-              </div>
-            </li>
-          ))}
+                  {l.unavailable && <p className="text-sm text-danger">{t('cart.unavailable')}</p>}
+                  {!l.unavailable && l.overStock && (
+                    <p className="text-sm text-danger">{t('cart.overStock', { n: l.product.stock_quantity })}</p>
+                  )}
+                  {l.product && !l.unavailable && (
+                    <div className="mt-auto flex items-center justify-between gap-3">
+                      <QuantitySelector value={l.quantity} max={l.product.stock_quantity} onChange={(n) => setQty(l.id, n)} />
+                      <div className="text-end">
+                        <p className="text-xs text-muted">{t('cart.each', { price: money(l.product.price) })}</p>
+                        <p className="font-semibold text-forest">{money(Number(l.product.price) * l.quantity)}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </li>
+            )
+          })}
         </ul>
 
-        <aside className="h-fit border border-line bg-moss p-6">
-          <h2 className="text-2xl">Summary</h2>
-          <div className="mt-5 flex justify-between"><span className="text-muted">Subtotal</span><span className="text-sage">{formatEGP(subtotal)}</span></div>
-          <p className="mt-3 text-xs text-muted">Payment: cash on delivery. Final prices are confirmed when you place the order.</p>
+        <aside className="h-fit rounded-2xl border border-line bg-paper p-6 shadow-card">
+          <h2 className="text-2xl text-forest">{t('cart.summary')}</h2>
+          <div className="mt-5 flex justify-between"><span className="text-muted">{t('cart.subtotal')}</span><span className="font-semibold text-forest">{money(subtotal)}</span></div>
+          <p className="mt-3 text-xs leading-relaxed text-muted">{t('cart.payNote')}</p>
           {canCheckout
-            ? <Link to="/checkout" className="btn-primary mt-6 w-full">Checkout</Link>
-            : <button disabled className="btn-primary mt-6 w-full">Checkout</button>}
-          {!canCheckout && <p className="mt-3 text-xs text-red-400">Fix the items above to continue.</p>}
-          <Link to="/shop" className="mt-4 block text-center text-xs uppercase tracking-widest text-muted hover:text-sage">Continue shopping</Link>
+            ? <Link to="/checkout" className="btn-primary mt-6 w-full">{t('cart.checkout')}</Link>
+            : <button disabled className="btn-primary mt-6 w-full">{t('cart.checkout')}</button>}
+          {!canCheckout && <p className="mt-3 text-xs text-danger">{t('cart.fix')}</p>}
+          <Link to="/shop" className="mt-4 block text-center text-sm font-medium text-forest hover:text-forest-hover">{t('cart.continue')}</Link>
         </aside>
       </div>
     </div>

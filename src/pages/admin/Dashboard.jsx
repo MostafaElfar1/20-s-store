@@ -39,21 +39,21 @@ export default function Dashboard() {
       <h1 className="text-4xl">Overview</h1>
       <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-5">
         {cards.map(([label, n]) => (
-          <div key={label} className="border border-line bg-moss p-5">
-            <p className="text-3xl text-sage">{n}</p><p className="mt-1 text-xs uppercase tracking-widest text-muted">{label}</p>
+          <div key={label} className="border border-line bg-paper p-5">
+            <p className="text-3xl text-forest">{n}</p><p className="mt-1 text-xs uppercase tracking-widest text-muted">{label}</p>
           </div>
         ))}
       </div>
-      <div className="mt-12 flex items-end justify-between"><h2 className="text-2xl">Recent orders</h2><Link to="/admin/orders" className="text-xs uppercase tracking-widest text-sage">View all</Link></div>
+      <div className="mt-12 flex items-end justify-between"><h2 className="text-2xl">Recent orders</h2><Link to="/admin/orders" className="text-xs uppercase tracking-widest text-forest">View all</Link></div>
       {d.recent.length === 0
-        ? <p className="mt-4 border border-line bg-moss p-6 text-muted">No orders yet.</p>
+        ? <p className="mt-4 border border-line bg-paper p-6 text-muted">No orders yet.</p>
         : (
           <div className="mt-4 overflow-x-auto border border-line">
             <table className="w-full text-left text-sm">
-              <thead className="bg-moss text-xs uppercase tracking-widest text-muted"><tr><th className="p-3">Order</th><th className="p-3">Customer</th><th className="p-3">Total</th><th className="p-3">Status</th><th className="p-3">Date</th></tr></thead>
+              <thead className="bg-paper text-xs uppercase tracking-widest text-muted"><tr><th className="p-3">Order</th><th className="p-3">Customer</th><th className="p-3">Total</th><th className="p-3">Status</th><th className="p-3">Date</th></tr></thead>
               <tbody>{d.recent.map((r) => (
                 <tr key={r.id} className="border-t border-line">
-                  <td className="p-3"><Link className="text-sage hover:underline" to={`/admin/orders/${r.id}`}>{r.order_number}</Link></td>
+                  <td className="p-3"><Link className="text-forest hover:underline" to={`/admin/orders/${r.id}`}>{r.order_number}</Link></td>
                   <td className="p-3">{r.customer_name}</td><td className="p-3">{formatEGP(r.subtotal)}</td>
                   <td className="p-3"><StatusBadge status={r.status} /></td><td className="p-3 text-muted">{formatDate(r.created_at)}</td>
                 </tr>))}</tbody>
