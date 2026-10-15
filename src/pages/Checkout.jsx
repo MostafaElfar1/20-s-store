@@ -1,10 +1,12 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { MapPin } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { getGeo, trackEvent } from '../lib/analytics'
 import { useCart } from '../context/CartContext'
 import { useLang } from '../i18n/LanguageContext'
 import { pick } from '../lib/products'
-import { GOVERNORATES, GOVERNORATES_AR, cleanPhone, validateCheckout } from '../lib/validators'
+import { GOVERNORATES, GOVERNORATES_AR, cleanPhone, governorateFromGeo, validateCheckout } from '../lib/validators'
 import EmptyState from '../components/ui/EmptyState'
 import Spinner from '../components/ui/Spinner'
 
@@ -23,10 +25,11 @@ function friendlyError(err, t) {
 
 // Defined at module level on purpose: a component created inside another component is a
 // brand-new component on every render, which remounts the input and drops focus after each key.
-const Field = ({ id, label, error, children }) => (
+const Field = ({ id, label, error, hint, children }) => (
   <div>
     <label htmlFor={id} className="mb-2 block text-sm font-medium text-forest">{label}</label>
     {children}
+    {hint && !error && <p className="mt-1 text-xs text-muted">{hint}</p>}
     {error && <p className="mt-1 text-sm text-danger" role="alert">{error}</p>}
   </div>
 )
@@ -35,10 +38,27 @@ export default function Checkout() {
   const navigate = useNavigate()
   const { t, lang, money } = useLang()
   const { lines, subtotal, canCheckout, loaded, items, clear, refresh } = useCart()
-  const [form, setForm] = useState({ name: '', phone: '', governorate: '', address: '', email: '', notes: '' })
+  const [form, setForm] = useState({ name: '', phone: '', governorate: '', city: '', address: '', email: '', notes: '' })
   const [errors, setErrors] = useState({})
   const [submitError, setSubmitError] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  const [guess, setGuess] = useState({ governorate: false, city: false }) // true while a field still holds our guess
+  const [loc, setLoc] = useState('idle') // idle | asking | done | denied | unsupported
+  // Pre-fill governorate and city from the approximate area. Only fills fields the customer has not touched,
+  // nothing is saved, and every value can be changed.
+  useEffect(() => {
+    let cancelled = false
+    getGeo().then((geo) => {
+      if (cancelled) return
+      const gov = governorateFromGeo(geo)
+      const city = geo.country === 'EG' && geo.city ? String(geo.city) : ''
+      if (!gov && !city) return
+      setForm((f) => ({ ...f, governorate: f.governorate || gov, city: f.city || city }))
+      setGuess((g) => ({ governorate: g.governorate || Boolean(gov), city: g.city || Boolean(city) }))
+    })
+    return () => { cancelled = true }
+  }, [])
+
   // One key per checkout attempt: repeated clicks/retries return the same order instead of a new one.
   const keyRef = useRef(crypto.randomUUID())
 
@@ -47,7 +67,27 @@ export default function Checkout() {
   }
   if (!loaded) return <Spinner label={t('cart.checking')} />
 
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
+  // Only runs when the customer taps the button; the browser then asks for permission.
+  // Coordinates are rounded to 3 decimals (about 100 m) before they are saved.
+  const shareLocation = () => {
+    if (!navigator.geolocation) return setLoc('unsupported')
+    setLoc('asking')
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const r = (n) => n.toFixed(3)
+        trackEvent('location_shared', { meta: `${r(pos.coords.latitude)},${r(pos.coords.longitude)}` })
+        setLoc('done')
+      },
+      () => setLoc('denied'),
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+    )
+  }
+
+  const set = (k) => (e) => {
+    setForm((f) => ({ ...f, [k]: e.target.value }))
+    if (guess[k]) setGuess((g) => ({ ...g, [k]: false })) // the customer has made their own choice
+  }
+  const fullAddress = () => [form.city.trim(), form.address.trim()].filter(Boolean).join(' - ')
 
   const submit = async (e) => {
     e.preventDefault()
@@ -74,7 +114,7 @@ export default function Checkout() {
         p_customer_phone: cleanPhone(form.phone),
         p_customer_email: form.email.trim() || null,
         p_governorate: form.governorate,
-        p_delivery_address: form.address,
+        p_delivery_address: fullAddress(),
         p_notes: form.notes.trim() || null,
         p_items: items.map((i) => ({ product_id: i.id, quantity: i.quantity })),
       })
@@ -83,8 +123,9 @@ export default function Checkout() {
       // Saved in the database. Keep a copy for the confirmation page (customers cannot read orders back).
       sessionStorage.setItem(LAST_ORDER_KEY, JSON.stringify({
         order: data,
-        customer: { name: form.name.trim(), phone: cleanPhone(form.phone), governorate: form.governorate, address: form.address.trim() },
+        customer: { name: form.name.trim(), phone: cleanPhone(form.phone), governorate: form.governorate, address: fullAddress() },
       }))
+      trackEvent('order_placed', { meta: data?.order_number })
       keyRef.current = crypto.randomUUID()
       navigate('/order-confirmed', { replace: true })
       clear()
@@ -107,15 +148,27 @@ export default function Checkout() {
           <Field id="phone" label={t('checkout.phone')} error={errors.phone}>
             <input id="phone" className="field" type="tel" inputMode="tel" autoComplete="tel" placeholder="01012345678" value={form.phone} onChange={set('phone')} />
           </Field>
-          <Field id="gov" label={t('checkout.gov')} error={errors.governorate}>
+          <Field id="gov" label={t('checkout.gov')} error={errors.governorate} hint={guess.governorate ? t('checkout.guess') : null}>
             <select id="gov" className="field" value={form.governorate} onChange={set('governorate')}>
               <option value="">{t('checkout.selectGov')}</option>
               {GOVERNORATES.map((g) => <option key={g} value={g}>{lang === 'ar' ? GOVERNORATES_AR[g] : g}</option>)}
             </select>
           </Field>
+          <Field id="city" label={t('checkout.city')} hint={guess.city ? t('checkout.guess') : null}>
+            <input id="city" className="field" autoComplete="address-level2" placeholder={t('checkout.cityPh')} value={form.city} onChange={set('city')} />
+          </Field>
           <Field id="address" label={t('checkout.address')} error={errors.address}>
             <textarea id="address" rows={3} className="field" autoComplete="street-address" value={form.address} onChange={set('address')} />
           </Field>
+          <div className="rounded-xl border border-line bg-paper p-4">
+            <button type="button" onClick={shareLocation} disabled={loc === 'asking' || loc === 'done'} className="btn-outline px-4 py-2 text-sm">
+              <MapPin size={16} /> {t('checkout.loc.btn')}
+            </button>
+            <p className={`mt-2 text-xs leading-relaxed ${loc === 'denied' || loc === 'unsupported' ? 'text-danger' : 'text-muted'}`} role="status">
+              {t(loc === 'done' ? 'checkout.loc.done' : loc === 'denied' ? 'checkout.loc.denied' : loc === 'unsupported' ? 'checkout.loc.unsupported' : 'checkout.loc.help')}
+            </p>
+          </div>
+
           <Field id="email" label={t('checkout.email')} error={errors.email}>
             <input id="email" className="field" type="email" autoComplete="email" value={form.email} onChange={set('email')} />
           </Field>

@@ -7,7 +7,7 @@ export default function PageTracker() {
   const { pathname } = useLocation()
   const last = useRef(null)
   useEffect(() => {
-    if (pathname.startsWith('/admin') || last.current === pathname) return
+    if (pathname.startsWith('/admin') || pathname.startsWith('/supervisor') || last.current === pathname) return
     last.current = pathname
     trackEvent('page_view', { path: pathname })
   }, [pathname])

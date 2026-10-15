@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { config } from '../../lib/config'
 import { useForceLtr } from '../../i18n/LanguageContext'
 
-export default function Login() {
+export default function Login({ redirectTo = '/admin', title = 'Admin sign in' }) {
   const { session, isAdmin, loading, signIn } = useAuth()
   useForceLtr()
   const [email, setEmail] = useState('')
@@ -12,7 +12,7 @@ export default function Login() {
   const [error, setError] = useState(null)
   const [busy, setBusy] = useState(false)
 
-  if (!loading && session && isAdmin) return <Navigate to="/admin" replace />
+  if (!loading && session && isAdmin) return <Navigate to={redirectTo} replace />
 
   const submit = async (e) => {
     e.preventDefault()
@@ -28,7 +28,7 @@ export default function Login() {
       <form onSubmit={submit} className="w-full max-w-sm space-y-5 border border-line bg-paper p-8">
         <div className="text-center">
           <p className="font-display text-3xl text-forest">{config.storeName}</p>
-          <p className="mt-1 text-xs uppercase tracking-widest text-muted">Admin sign in</p>
+          <p className="mt-1 text-xs uppercase tracking-widest text-muted">{title}</p>
         </div>
         <div>
           <label htmlFor="email" className="mb-2 block text-xs uppercase tracking-widest text-muted">Email</label>

@@ -13,6 +13,21 @@ export const GOVERNORATES = [
   'Red Sea', 'Matrouh', 'New Valley',
 ]
 
+// ISO 3166-2:EG region codes (what the geo lookup returns) -> the governorate names above
+const EG_REGION = {
+  ALX: 'Alexandria', ASN: 'Aswan', AST: 'Asyut', BA: 'Red Sea', BH: 'Beheira', BNS: 'Beni Suef', C: 'Cairo',
+  DK: 'Dakahlia', DT: 'Damietta', FYM: 'Faiyum', GH: 'Gharbia', GZ: 'Giza', IS: 'Ismailia', JS: 'South Sinai',
+  KB: 'Qalyubia', KFS: 'Kafr El Sheikh', KN: 'Qena', LX: 'Luxor', MN: 'Minya', MNF: 'Monufia', MT: 'Matrouh',
+  PTS: 'Port Said', SHG: 'Sohag', SHR: 'Sharqia', SIN: 'North Sinai', SUZ: 'Suez', WAD: 'New Valley',
+}
+
+// Best guess of the governorate from the approximate geo data, or '' when we are not sure.
+export function governorateFromGeo(geo) {
+  if (!geo || geo.country !== 'EG') return ''
+  if (geo.region && EG_REGION[geo.region]) return EG_REGION[geo.region]
+  return GOVERNORATES.find((g) => g.toLowerCase() === (geo.city || '').toLowerCase()) || ''
+}
+
 export const GOVERNORATES_AR = {
   'Cairo': 'القاهرة', 'Giza': 'الجيزة', 'Alexandria': 'الإسكندرية', 'Qalyubia': 'القليوبية',
   'Dakahlia': 'الدقهلية', 'Sharqia': 'الشرقية', 'Gharbia': 'الغربية', 'Monufia': 'المنوفية',

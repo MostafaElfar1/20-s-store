@@ -21,6 +21,8 @@ import AdminProducts from './pages/admin/Products'
 import AdminOrders from './pages/admin/Orders'
 import AdminOrderDetails from './pages/admin/OrderDetails'
 import AdminAnalytics from './pages/admin/Analytics'
+import SupervisorLayout from './components/supervisor/SupervisorLayout'
+import Supervisor from './pages/supervisor/Supervisor'
 
 export default function App() {
   return (
@@ -29,13 +31,17 @@ export default function App() {
       <AuthProvider>
       <CartProvider>
         <PageTracker />
-        {/* HashRouter keeps the page in the URL hash; rewrite it so Vercel sees /product/..., and skip admin pages. */}
+        {/* HashRouter keeps the page in the URL hash; rewrite it so Vercel sees /product/..., and skip admin and supervisor pages. */}
         <Analytics beforeSend={(e) => {
           const url = e.url.replace('/#/', '/')
-          return /\/admin/.test(url) ? null : { ...e, url }
+          return /\/(admin|supervisor)/.test(url) ? null : { ...e, url }
         }} />
         <Routes>
           <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/supervisor/login" element={<AdminLogin redirectTo="/supervisor" title="Supervisor sign in" />} />
+          <Route path="/supervisor" element={<SupervisorLayout />}>
+            <Route index element={<Supervisor />} />
+          </Route>
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="products" element={<AdminProducts />} />
