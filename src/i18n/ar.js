@@ -1,4 +1,4 @@
-// Arabic strings (Modern Standard Arabic, kept simple and friendly).
+// Arabic strings 
 const qty = (n, one, two, few, many) => (n === 1 ? one : n === 2 ? two : n <= 10 ? `${n} ${few}` : `${n} ${many}`)
 
 export default {

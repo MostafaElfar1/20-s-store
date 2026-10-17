@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { Instagram, Facebook, MessageCircle } from 'lucide-react'
 import { config } from '../../lib/config'
 import { useLang } from '../../i18n/LanguageContext'
-import { LOGO } from './Navbar'
+import { LOGO, LOGOF } from './Navbar'
 
 export default function Footer() {
   const { t, slogan } = useLang()
@@ -14,7 +14,7 @@ export default function Footer() {
       <div className="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div className="sm:col-span-2 lg:col-span-1">
           <div className="flex items-center gap-3">
-            <img src={LOGO} alt="" className="h-12 w-auto rounded-md bg-cream/5" />
+            <img src={LOGOF} alt="" className="h-12 w-auto rounded-md bg-cream/5" />
             {/* <p className="font-display text-2xl">{config.storeName}</p> */}
           </div>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-cream/75">{slogan}</p>

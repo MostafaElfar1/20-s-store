@@ -6,6 +6,7 @@ import { useCart } from '../../context/CartContext'
 import { useLang } from '../../i18n/LanguageContext'
 
 export const LOGO = `${import.meta.env.BASE_URL}icon.png`
+export const LOGOF = `${import.meta.env.BASE_URL}iconf.png`
 
 export default function Navbar() {
   const { count } = useCart()
