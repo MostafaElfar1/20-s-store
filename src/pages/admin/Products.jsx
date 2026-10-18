@@ -10,6 +10,15 @@ import ErrorState from '../../components/ui/ErrorState'
 import ProductImage from '../../components/shop/ProductImage'
 import ProductForm from '../../components/admin/ProductForm'
 
+const sizesSorted = (p) => [...(p.product_variants || [])].sort((a, b) => a.size_ml - b.size_ml)
+// "From" price when the sizes have different prices
+function priceText(p) {
+  const prices = (p.product_variants || []).map((v) => Number(v.price))
+  if (prices.length < 2) return formatEGP(p.price)
+  const lo = Math.min(...prices), hi = Math.max(...prices)
+  return lo === hi ? formatEGP(lo) : `${formatEGP(lo)} - ${formatEGP(hi)}`
+}
+
 export default function Products() {
   const toast = useToast()
   const [state, setState] = useState({ products: [], loading: true, error: null })
@@ -19,13 +28,11 @@ export default function Products() {
 
   const load = useCallback(async () => {
     setState((s) => ({ ...s, loading: true, error: null }))
-    const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false })
+    const { data, error } = await supabase.from('products').select('*, product_variants(size_ml, price, compare_at_price, stock_quantity)').order('created_at', { ascending: false })
     if (error) setState({ products: [], loading: false, error: 'Could not load products.' })
     else setState({ products: data, loading: false, error: null })
   }, [])
   useEffect(() => { load() }, [load])
-
-  const categories = [...new Set(state.products.map((p) => p.category).filter(Boolean))]
 
   const toggleActive = async (p) => {
     const { error } = await supabase.from('products').update({ is_active: !p.is_active }).eq('id', p.id)
@@ -70,13 +77,21 @@ export default function Products() {
                   <td className="p-3">
                     <div className="flex items-center gap-3">
                       <div className="w-12 shrink-0"><ProductImage product={p} /></div>
-                      <div><p>{p.name}</p><p className="text-xs text-muted">{[p.brand, p.category].filter(Boolean).join(' / ')}</p></div>
+                      <div><p>{p.name}</p><p className="text-xs text-muted">{p.category || ''}</p></div>
                     </div>
                   </td>
-                  <td className="p-3">{formatEGP(p.price)}</td>
-                  <td className={`p-3 ${p.stock_quantity === 0 ? 'text-danger' : p.stock_quantity <= 5 ? 'text-yellow-300' : ''}`}>{p.stock_quantity}</td>
+                  <td className="whitespace-nowrap p-3">{priceText(p)}</td>
+                  <td className="p-3">
+                    <div className="flex flex-wrap gap-1.5">
+                      {sizesSorted(p).map((v) => (
+                        <span key={v.size_ml} className={`rounded-full border px-2 py-0.5 text-xs ${v.stock_quantity === 0 ? 'border-danger/40 text-danger' : v.stock_quantity <= 5 ? 'border-amber-600/40 text-amber-700' : 'border-line text-ink'}`}>
+                          {v.size_ml} ml: {v.stock_quantity}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
                   <td className="p-3 text-xs">
-                    <span className={p.is_active ? 'text-emerald-300' : 'text-muted'}>{p.is_active ? 'Active' : 'Hidden'}</span>
+                    <span className={p.is_active ? 'text-emerald-700' : 'text-muted'}>{p.is_active ? 'Active' : 'Hidden'}</span>
                     {p.featured && <span className="ml-2 text-forest">Featured</span>}
                   </td>
                   <td className="p-3">
@@ -95,7 +110,7 @@ export default function Products() {
 
       {editing && (
         <Modal title={editing === 'new' ? 'Add product' : 'Edit product'} wide onClose={() => setEditing(null)}>
-          <ProductForm product={editing === 'new' ? null : editing} categories={categories}
+          <ProductForm product={editing === 'new' ? null : editing}
             onCancel={() => setEditing(null)}
             onSaved={() => { setEditing(null); toast('Product saved.'); load() }} />
         </Modal>

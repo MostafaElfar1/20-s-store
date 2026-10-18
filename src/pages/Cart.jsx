@@ -28,7 +28,7 @@ export default function Cart() {
           {lines.map((l) => {
             const name = l.product ? pick(l.product, 'name', lang) : t('cart.unavailableName')
             return (
-              <li key={l.id} className="flex gap-4 rounded-2xl border border-line bg-paper p-3 shadow-card sm:p-4">
+              <li key={l.key} className="flex gap-4 rounded-2xl border border-line bg-paper p-3 shadow-card sm:p-4">
                 <div className="w-24 shrink-0">
                   {l.product ? <ProductImage product={l.product} className="rounded-xl" /> : <div className="aspect-[4/5] rounded-xl bg-sage-soft" />}
                 </div>
@@ -36,20 +36,20 @@ export default function Cart() {
                   <div className="flex justify-between gap-3">
                     <div>
                       <p className="font-display text-lg text-ink">{name}</p>
-                      {l.product?.brand && <p className="text-xs uppercase tracking-[0.14em] text-muted">{l.product.brand}</p>}
+                      {l.variant && <p className="text-xs uppercase tracking-[0.14em] text-muted">{t('product.ml', { n: l.variant.size_ml })}</p>}
                     </div>
-                    <button aria-label={t('cart.remove', { name })} onClick={() => remove(l.id)} className="h-fit rounded-full p-2 text-muted transition-colors hover:bg-sage-soft hover:text-danger"><Trash2 size={16} /></button>
+                    <button aria-label={t('cart.remove', { name })} onClick={() => remove(l.key)} className="h-fit rounded-full p-2 text-muted transition-colors hover:bg-sage-soft hover:text-danger"><Trash2 size={16} /></button>
                   </div>
-                  {l.unavailable && <p className="text-sm text-danger">{t('cart.unavailable')}</p>}
+                  {l.unavailable && <p className="text-sm text-danger">{t(l.needsSize ? 'cart.needSize' : 'cart.unavailable')}</p>}
                   {!l.unavailable && l.overStock && (
-                    <p className="text-sm text-danger">{t('cart.overStock', { n: l.product.stock_quantity })}</p>
+                    <p className="text-sm text-danger">{t('cart.overStock', { n: l.stock })}</p>
                   )}
                   {l.product && !l.unavailable && (
                     <div className="mt-auto flex items-center justify-between gap-3">
-                      <QuantitySelector value={l.quantity} max={l.product.stock_quantity} onChange={(n) => setQty(l.id, n)} />
+                      <QuantitySelector value={l.quantity} max={l.stock} onChange={(n) => setQty(l.key, n)} />
                       <div className="text-end">
-                        <p className="text-xs text-muted">{t('cart.each', { price: money(l.product.price) })}</p>
-                        <p className="font-semibold text-forest">{money(Number(l.product.price) * l.quantity)}</p>
+                        <p className="text-xs text-muted">{t('cart.each', { price: money(l.unitPrice) })}</p>
+                        <p className="font-semibold text-forest">{money(l.unitPrice * l.quantity)}</p>
                       </div>
                     </div>
                   )}

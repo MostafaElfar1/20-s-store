@@ -7,7 +7,7 @@ export default function ProductImage({ product, className = '' }) {
   const { t, lang } = useLang()
   const url = productImageUrl(product.image_path)
   const name = pick(product, 'name', lang)
-  const alt = t('product.alt', { name, brand: product.brand, ml: product.volume_ml })
+  const alt = t('product.alt', { name, brand: product.brand, ml: product.variants?.length > 1 ? null : product.volume_ml })
   return (
     <div className={`aspect-[4/5] w-full overflow-hidden bg-sage-soft ${className}`}>
       {url

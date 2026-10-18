@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase'
 import { getGeo, trackEvent } from '../lib/analytics'
 import { useCart } from '../context/CartContext'
 import { useLang } from '../i18n/LanguageContext'
-import { pick } from '../lib/products'
+import { pick, pickVariant, unitStock } from '../lib/products'
 import { GOVERNORATES, GOVERNORATES_AR, cleanPhone, governorateFromGeo, validateCheckout } from '../lib/validators'
 import EmptyState from '../components/ui/EmptyState'
 import Spinner from '../components/ui/Spinner'
@@ -16,6 +16,7 @@ export const LAST_ORDER_KEY = 'twenties_last_order'
 function friendlyError(err, t) {
   const m = err?.message || ''
   if (m.includes('INSUFFICIENT_STOCK')) return t('checkout.fail.stock', { name: m.split('INSUFFICIENT_STOCK:')[1]?.trim() })
+  if (m.includes('VARIANT_REQUIRED')) return t('checkout.fail.variant')
   if (m.includes('PRODUCT_UNAVAILABLE')) return t('checkout.fail.unavailable')
   if (m.includes('INVALID_PHONE')) return t('checkout.fail.phone')
   if (m.includes('INVALID_')) return t('checkout.fail.invalid')
@@ -102,7 +103,13 @@ export default function Checkout() {
       // Re-check prices/stock first for a friendly message; the database function re-checks again authoritatively.
       const fresh = await refresh()
       if (fresh === null) throw new Error('network')
-      const problem = items.find((i) => !fresh[i.id] || fresh[i.id].stock_quantity < i.quantity)
+      const problem = items.find((i) => {
+        const p = fresh[i.id]
+        if (!p || !p.is_active) return true
+        const v = pickVariant(p, i.vid)
+        if (p.variants.length > 0 && !v) return true // that size no longer exists
+        return unitStock(p, v) < i.quantity
+      })
       if (problem) {
         setSubmitError(t('checkout.fail.review'))
         return
@@ -116,7 +123,7 @@ export default function Checkout() {
         p_governorate: form.governorate,
         p_delivery_address: fullAddress(),
         p_notes: form.notes.trim() || null,
-        p_items: items.map((i) => ({ product_id: i.id, quantity: i.quantity })),
+        p_items: items.map((i) => ({ product_id: i.id, variant_id: i.vid || null, quantity: i.quantity })),
       })
       if (error) throw error
 
@@ -194,9 +201,9 @@ export default function Checkout() {
           <h2 className="text-2xl text-forest">{t('checkout.summary')}</h2>
           <ul className="mt-5 space-y-3 text-sm">
             {lines.map((l) => (
-              <li key={l.id} className="flex justify-between gap-3">
-                <span>{l.product ? pick(l.product, 'name', lang) : t('checkout.unavailable')} <span className="text-muted">x{l.quantity}</span></span>
-                <span className="text-muted">{l.product ? money(Number(l.product.price) * l.quantity) : '-'}</span>
+              <li key={l.key} className="flex justify-between gap-3">
+                <span>{l.product ? pick(l.product, 'name', lang) : t('checkout.unavailable')}{l.variant ? <span className="text-muted"> · {t('product.ml', { n: l.variant.size_ml })}</span> : null} <span className="text-muted">x{l.quantity}</span></span>
+                <span className="text-muted">{l.product && !l.needsSize ? money(l.unitPrice * l.quantity) : '-'}</span>
               </li>
             ))}
           </ul>

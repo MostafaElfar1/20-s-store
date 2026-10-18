@@ -1,0 +1,14 @@
+/* Font themes. Every rule only applies when <html data-fonts="..."> is set by src/fontTheme.js,
+   so with 'classic' nothing in this file does anything and the store looks exactly like before. */
+
+/* ---- logo: DM Serif Display + DM Sans ---- */
+html[data-fonts='logo'] body { font-family: 'DM Sans', system-ui, sans-serif; }
+html[data-fonts='logo'] :is(h1, h2, h3, .font-display) { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; }
+html[data-fonts='logo'][lang='ar'] body { font-family: 'Tajawal', 'Cairo', system-ui, sans-serif; }
+html[data-fonts='logo'][lang='ar'] :is(h1, h2, h3, .font-display) { font-family: 'Reem Kufi', 'Tajawal', sans-serif; font-weight: 600; }
+
+/* ---- boutique: Bodoni Moda + Jost ---- */
+html[data-fonts='boutique'] body { font-family: 'Jost', system-ui, sans-serif; }
+html[data-fonts='boutique'] :is(h1, h2, h3, .font-display) { font-family: 'Bodoni Moda', 'Playfair Display', Georgia, serif; font-weight: 500; }
+html[data-fonts='boutique'][lang='ar'] body { font-family: 'Tajawal', 'Cairo', system-ui, sans-serif; }
+html[data-fonts='boutique'][lang='ar'] :is(h1, h2, h3, .font-display) { font-family: 'Amiri', 'Tajawal', serif; font-weight: 400; }

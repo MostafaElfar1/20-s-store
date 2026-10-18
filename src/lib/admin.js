@@ -19,18 +19,17 @@ export function validateImage(file) {
   return null
 }
 
-export function validateProduct(f) {
+// `sizes` = { 30: { on, price, compare, stock }, 50: {...}, ... } (see SizeEditor)
+export function validateProduct(f, sizes) {
   const e = {}
-  const price = Number(f.price)
   if (!f.name.trim()) e.name = 'Name is required.'
-  if (f.price === '' || Number.isNaN(price) || price < 0) e.price = 'Enter a valid price (0 or more).'
-  if (f.compare_at_price !== '') {
-    const c = Number(f.compare_at_price)
-    if (Number.isNaN(c) || c <= price) e.compare_at_price = 'Comparison price must be higher than the price.'
+  const on = Object.entries(sizes).filter(([, s]) => s.on)
+  if (on.length === 0) e.sizes = 'Tick at least one size.'
+  for (const [ml, s] of on) {
+    const price = Number(s.price)
+    if (s.price === '' || Number.isNaN(price) || price <= 0) e[`size-${ml}`] = 'Enter the price.'
+    else if (s.compare !== '' && (Number.isNaN(Number(s.compare)) || Number(s.compare) <= price)) e[`size-${ml}`] = 'The old price must be higher than the price.'
+    else if (s.stock === '' || !Number.isInteger(Number(s.stock)) || Number(s.stock) < 0) e[`size-${ml}`] = 'Stock must be a whole number (0 or more).'
   }
-  if (f.stock_quantity === '' || !Number.isInteger(Number(f.stock_quantity)) || Number(f.stock_quantity) < 0)
-    e.stock_quantity = 'Stock must be a whole number (0 or more).'
-  if (f.volume_ml !== '' && (!Number.isInteger(Number(f.volume_ml)) || Number(f.volume_ml) <= 0))
-    e.volume_ml = 'Volume must be a positive whole number.'
   return e
 }

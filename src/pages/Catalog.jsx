@@ -3,13 +3,22 @@ import { useSearchParams } from 'react-router-dom'
 import { Search, SlidersHorizontal } from 'lucide-react'
 import { useProducts } from '../hooks/useProducts'
 import { useLang } from '../i18n/LanguageContext'
-import { categoryLabels } from '../lib/products'
+import { categoryLabels, isInStock, sizesOf } from '../lib/products'
+import { categoryLabel } from '../lib/categories'
+import { OCCASIONS, noteLabel, occasionLabel } from '../lib/catalogOptions'
 import ProductCard from '../components/shop/ProductCard'
 import Spinner from '../components/ui/Spinner'
 import ErrorState from '../components/ui/ErrorState'
 import EmptyState from '../components/ui/EmptyState'
 
 const PAGE = 12
+
+// What the search box looks through: names, category and the perfume notes (English and Arabic).
+const searchText = (p) =>
+  [p.name, p.name_ar, p.brand, p.category, p.category_ar, categoryLabel(p.category, 'ar'),
+    ...(p.notes_top || []), ...(p.notes_heart || []), ...(p.notes_base || []),
+    ...[...(p.notes_top || []), ...(p.notes_heart || []), ...(p.notes_base || [])].map((n) => noteLabel(n, 'ar')),
+  ].filter(Boolean).join(' ').toLowerCase()
 
 const Group = ({ title, children }) => (
   <div className="border-t border-line pt-5 first:border-0 first:pt-0">
@@ -31,6 +40,7 @@ export default function Catalog() {
   const featuredOnly = params.get('featured') === '1'
   const stock = params.get('stock') || ''                       // '' | 'in' | 'out'
   const sizes = (params.get('size') || '').split(',').filter(Boolean).map(Number)
+  const uses = (params.get('use') || '').split(',').filter(Boolean)   // "when & where" tags
 
   const update = (key, value) => {
     const next = new URLSearchParams(params)
@@ -38,29 +48,33 @@ export default function Catalog() {
     setParams(next, { replace: true })
     setVisible(PAGE)
   }
+  const toggleUse = (k) => update('use', (uses.includes(k) ? uses.filter((u) => u !== k) : [...uses, k]).join(','))
   const toggleSize = (ml) => update('size', (sizes.includes(ml) ? sizes.filter((s) => s !== ml) : [...sizes, ml]).sort((a, b) => a - b).join(','))
 
   const labels = useMemo(() => categoryLabels(products, lang), [products, lang])
-  const categories = useMemo(() => [...labels].sort((a, b) => a[1].localeCompare(b[1], lang)), [labels, lang])
-  const allSizes = useMemo(() => [...new Set(products.map((p) => p.volume_ml).filter(Boolean))].sort((a, b) => a - b), [products])
+  const categories = useMemo(() => [...labels], [labels]) // already in the order of lib/categories.js
+  const allSizes = useMemo(() => [...new Set(products.flatMap(sizesOf))].sort((a, b) => a - b), [products])
+  // only offer the "when & where" tags that at least one product really has
+  const allUses = useMemo(() => OCCASIONS.filter((o) => products.some((p) => p.occasions?.includes(o.key))), [products])
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase()
     let list = products.filter((p) =>
-      (!term || [p.name, p.name_ar, p.brand].some((v) => (v || '').toLowerCase().includes(term))) &&
+      (!term || searchText(p).includes(term)) &&
       (!category || p.category === category) &&
       (!featuredOnly || p.featured) &&
-      (!sizes.length || sizes.includes(p.volume_ml)) &&
-      (stock !== 'in' || p.stock_quantity > 0) &&
-      (stock !== 'out' || p.stock_quantity <= 0))
+      (!sizes.length || sizesOf(p).some((s) => sizes.includes(s))) &&
+      (!uses.length || uses.some((k) => p.occasions?.includes(k))) &&
+      (stock !== 'in' || isInStock(p, sizes)) &&
+      (stock !== 'out' || !isInStock(p, sizes)))
     if (sort === 'price-asc') list = [...list].sort((a, b) => a.price - b.price)
     else if (sort === 'price-desc') list = [...list].sort((a, b) => b.price - a.price)
     else list = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     return list
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [products, q, category, sort, featuredOnly, stock, params.get('size')])
+  }, [products, q, category, sort, featuredOnly, stock, params.get('size'), params.get('use')])
 
-  const activeCount = [category, featuredOnly, stock, sizes.length].filter(Boolean).length
+  const activeCount = [category, featuredOnly, stock, sizes.length, uses.length].filter(Boolean).length
   const clearAll = () => { setParams(q ? { q } : {}, { replace: true }); setVisible(PAGE) }
 
   const panel = (
@@ -80,6 +94,17 @@ export default function Catalog() {
             {allSizes.map((ml) => (
               <button key={ml} type="button" aria-pressed={sizes.includes(ml)} onClick={() => toggleSize(ml)}
                 className={`chip ${sizes.includes(ml) ? 'chip-on' : ''}`}>{t('product.ml', { n: ml })}</button>
+            ))}
+          </div>
+        </Group>
+      )}
+
+      {allUses.length > 0 && (
+        <Group title={t('filter.use')}>
+          <div className="flex flex-wrap gap-2">
+            {allUses.map((o) => (
+              <button key={o.key} type="button" aria-pressed={uses.includes(o.key)} onClick={() => toggleUse(o.key)}
+                className={`chip ${uses.includes(o.key) ? 'chip-on' : ''}`}>{occasionLabel(o.key, lang)}</button>
             ))}
           </div>
         </Group>

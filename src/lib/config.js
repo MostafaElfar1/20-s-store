@@ -9,5 +9,6 @@ export const config = {
   whatsappNumber: (import.meta.env.VITE_WHATSAPP_NUMBER || '').replace(/\D/g, ''),
   instagramUrl: import.meta.env.VITE_INSTAGRAM_URL || '',
   facebookUrl: import.meta.env.VITE_FACEBOOK_URL || '',
+  tiktokUrl: import.meta.env.VITE_TIKTOK_URL || '',
 }
 export const isSupabaseConfigured = Boolean(config.supabaseUrl && config.supabaseKey)

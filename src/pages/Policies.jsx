@@ -4,7 +4,7 @@ import { useLang } from '../i18n/LanguageContext'
 // Edit src/i18n/en.js and ar.js (keys starting with "pol.") to change the policies.
 export default function Policies() {
   const { t } = useLang()
-  const sections = ['payment', 'orders', 'contact', 'privacy']
+  const sections = ['payment', 'orders', 'contact' ]
   return (
     <div className="container-x max-w-2xl py-14">
       {/* <p className="eyebrow">{config.storeName}</p> */}
